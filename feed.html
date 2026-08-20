@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Card Chasers - P2P Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            min-height: 100vh;
+            background-color: rgba(20, 20, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            background: #1a1a1a;
+            border-bottom: 2px solid #ff6600;
+            letter-spacing: 1px;
+        }
+
+        .views-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 90px;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* MARKETPLACE GRID VIEW */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .market-card {
+            background-color: #242424;
+            border: 1px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .market-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .card-details {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .card-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .price-tag {
+            background-color: #ff6600;
+            color: #000;
+            font-weight: 900;
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .btn-trade {
+            background: linear-gradient(to right, #ff3300, #ff9900);
+            border: none;
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* UPLOAD FORM VIEW */
+        .form-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed #ff6600;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 102, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .upload-dropzone input {
+            display: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 12px;
+            color: white;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ff6600;
+        }
+
+        textarea {
+            height: 60px;
+            resize: none;
+        }
+
+        .btn-submit {
+            background: linear-gradient(to right, #ff3300, #ff9900);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* FOOTER NAV BAR */
+        .footer-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: #000;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #333;
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: #777;
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .nav-item.active {
+            color: #ff6600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app-bg">
+        <header id="header-title">Live Trade Feed</header>
+
+        <div class="views-container">
+            
+            <!-- VIEW 1: MARKETPLACE FEED -->
+            <div id="feed-view" class="view-section active">
+                <div class="card-grid" id="market-grid">
+                    <!-- Dynamic cards inject here -->
+                </div>
+            </div>
+
+            <!-- VIEW 2: UPLOAD ASSET FORM -->
+            <div id="upload-view" class="view-section">
+                <form id="card-form" class="form-box">
+                    
+                    <div class="upload-dropzone" onclick="document.getElementById('card-img-file').click()">
+                        <span id="file-label" style="color: #ff6600; font-weight: bold; font-size: 0.85rem;">+ TAP TO SELECT CARD IMAGE</span>
+                        <input type="file" id="card-img-file" accept="image/*" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>PLAYER NAME</label>
+                        <input type="text" id="p-name" placeholder="e.g. Pro Prospect" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>CARD SET & YEAR</label>
+                        <input type="text" id="p-set" placeholder="e.g. 2024 Upper Deck" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>SPORT CATEGORY</label>
+                        <select id="p-sport">
+                            <option value="hockey">Hockey</option>
+                            <option value="football">Football</option>
+                            <option value="basketball">Basketball</option>
+                            <option value="baseball">Baseball</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>TRADE VALUE ($)</label>
+                        <input type="number" id="p-price" placeholder="150" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>CONDITION NOTES</label>
+                        <textarea id="p-notes" placeholder="Raw, clean corners..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">PUBLISH TO THE HUNT</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- FOOTER NAVIGATION -->
+        <nav class="footer-nav">
+            <button class="nav-item active" onclick="switchView('feed')">
+                <span>📊</span> Feed
+            </button>
+            <button class="nav-item" onclick="switchView('upload')">
+                <span>➕</span> List Asset
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        // Tab Switcher Logic
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            if(viewName === 'feed') {
+                document.getElementById('feed-view').classList.add('active');
+                document.event = document.querySelectorAll('.nav-item')[0].classList.add('active');
+                document.getElementById('header-title').innerText = "Live Trade Feed";
+                loadMarketplaceCards();
+            } else {
+                document.getElementById('upload-view').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+                document.getElementById('header-title').innerText = "List a New Asset";
+            }
+        }
+
+        // Handle Image File Name Display
+        const fileInput = document.getElementById('card-img-file');
+        fileInput.addEventListener('change', function() {
+            if(fileInput.files[0]) {
+                document.getElementById('file-label').innerText = "Selected: " + fileInput.files[0].name;
+            }
+        });
+
+        // Save Card to LocalStorage Library & Refresh Feed
+        document.getElementById('card-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(uploadEvent) {
+                const newCard = {
+                    name: document.getElementById('p-name').value,
+                    set: document.getElementById('p-set').value,
+                    sport: document.getElementById('p-sport').value,
+                    price: document.getElementById('p-price').value,
+                    image: uploadEvent.target.result // Converts image to data string for storage
+                };
+
+                // Grab existing library or start fresh array
+                let library = JSON.parse(localStorage.getItem('cardChasersLibrary')) || [];
+                library.unshift(newCard); // Add newest to front
+
+                localStorage.setItem('cardChasersLibrary', JSON.stringify(library));
+
+                // Reset and flip back to feed
+                document.getElementById('card-form').reset();
+                document.getElementById('file-label').innerText = "+ TAP TO SELECT CARD IMAGE";
+                switchView('feed');
+            };
+
+            if(file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load and Render Cards into Marketplace Grid
+        function loadMarketplaceCards() {
+            const grid = document.getElementById('market-grid');
+            let library = JSON.parse(localStorage.getItem('cardChasersLibrary')) || [];
+
+            // Default starter cards if library is empty
+            if(library.length === 0) {
+                library = [
+                    { name: "Pro Prospect", set: "2016 Series 1", sport: "hockey", price: "250", image: "sports-montage.jpg" }
+                ];
+            }
+
+            grid.innerHTML = "";
+            library.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'market-card';
+                cardEl.innerHTML = `
+                    <img src="${card.image}" alt="${card.name}" onerror="this.src='sports-montage.jpg'">
+                    <div class="card-details">
+                        <div class="player-name">${card.name}</div>
+                        <div class="card-meta">${card.set}</div>
+                        <div class="card-price-row">
+                            <span class="price-tag">$${card.price}</span>
+                            <button class="btn-trade" onclick="alert('Trade offer initiated for ${card.name}!')">Offer</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardEl);
+            });
+        }
+
+        // Initialize feed on load
+        loadMarketplaceCards();
+    </script>
+</body>
+</html>
