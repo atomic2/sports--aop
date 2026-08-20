@@ -162,7 +162,8 @@
             <div class="logo-text">CARD<span>CHASERS</span></div>
 
             <!-- Redirects straight into the marketplace feed app loop -->
-            <form action="feed.html">
+          <!-- Updated form that lets you bypass straight into the feed -->
+            <form onsubmit="event.preventDefault(); window.location.href='feed.html';">
                 <div class="input-group">
                     <input type="text" placeholder="USERNAME // ID" required>
                 </div>
